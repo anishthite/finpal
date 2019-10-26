@@ -5,14 +5,23 @@ For the examples we are using 'requests' which is a popular minimalistic python 
 Please use 'pip install requests' to add it to your python libraries.
 """
 
-def convertstock():
-    
 
-portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : 'BLK~25|AAPL~25|IXN~25|MALOX~25'})
+
+
+# def convertstock(stocks, proporitons):
+#     string = ''
+#     positioncounter = 0
+#     for stock in stocks:
+#         ''.join(string,stock,'~')
+
+
+portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : 'BLK~50|SNP500~50'})
 portfolioAnalysisRequest.text # get in text string format
 portfolioAnalysisRequest.json # get as json object
 y = json.loads(portfolioAnalysisRequest.text)
-y = y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['weightedAveragePerformance']
+#print(y)
+
+y = y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['expectedReturns']#['riskData']['totalRisk']#['weightedAveragePerformance']
 #  :  3,
 #  :  1.75,
 # rnrRatingY3 :  2.5,
@@ -35,7 +44,8 @@ y = y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['weightedAverage
 # rnrSharpeRatioY15 :  0.35,
 # rnrSharpeRatioY3 :  0.465,
 # rnrSharpeRatioY5 :  0.54,
-print('rating' + str(y['rnrRatingOverall']))
-print('ret' + str(y['rnrRiskAdjustedReturnOverall']))
-print('risk' + str(y['rnrRiskScoreOverall']))
-print('sharpe' + str(y['rnrSharpeRatioY1']))
+print(y)
+# print('rating' + str(y['rnrRatingOverall']))
+# print('ret' + str(y['rnrRiskAdjustedReturnOverall']))
+# print('risk' + str(y['rnrRiskScoreOverall']))
+# print('sharpe' + str(y['rnrSharpeRatioY1']))
