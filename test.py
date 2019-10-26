@@ -15,13 +15,20 @@ Please use 'pip install requests' to add it to your python libraries.
 #         ''.join(string,stock,'~')
 
 
-portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : 'BLK~50|SNP500~50'})
+portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={
+    'positions' : 'BLK~50|SNP500~50',
+    'outputFormat': 'json',
+    'calculateExposures': 'true',
+    'calculatePerformance':'true',
+    'prettifyJson':'true'
+})
 portfolioAnalysisRequest.text # get in text string format
-portfolioAnalysisRequest.json # get as json object
+portfolioAnalysisRequest.json() # get as json object
 y = json.loads(portfolioAnalysisRequest.text)
 #print(y)
 
-y = y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['expectedReturns']#['riskData']['totalRisk']#['weightedAveragePerformance']
+y = y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['latestPerf'].keys()
+#['riskData']['totalRisk']#['weightedAveragePerformance']
 #  :  3,
 #  :  1.75,
 # rnrRatingY3 :  2.5,

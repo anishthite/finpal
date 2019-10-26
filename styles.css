@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Roboto&display=swap');
+html {font-size: 16px;}
+body {
+  background: linear-gradient(45deg, #F16F0F, #F1530F);
+}
+.header {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 6.3em;
+  color: #FDFFFC;
+  text-align: center;
+}
+.bot-container {
+  width: 70%;
+  height: 70vh;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+.sub-head {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.7em;
+  color: #FDFFFC;
+  text-align: center;
+}
