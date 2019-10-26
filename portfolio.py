@@ -70,16 +70,28 @@ class Portfolio:
             mystr = ''.join([mystr,compstr,'|'])
         return mystr
 
-    def get_expected_returns(self):
-        import requests
-        portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : 'USD ', 'calculateRisk' : 'true'})
+    def get_market_returns(self):
+        import requests, json
+        mystr = self.blackrockify()
+        portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : mystr})
         portfolioAnalysisRequest.text # get in text string format
         portfolioAnalysisRequest.json # get as json object
-        y = json.loads(portfolioAnalysisRequest.text)
+        self.y = json.loads(portfolioAnalysisRequest.text)
+        #print(json.dumps(self.y, indent=2))
+        vy = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['weightedAveragePerformance']
+        self.returns = vy['marketReturnM1']
+        self.other = vy['marketReturnM2']
+        self.recommend()
         
+    def recommend(self):
+        # if self.other > self.returns:
+        #     return(None)
+        # else:
+        start = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']#['startDate']
+        print(start)
 if __name__ == "__main__":
     port = Portfolio(0,['DSY'])
-    port.blackrockify()
+    port.get_market_returns()
 
 
 
