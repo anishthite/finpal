@@ -77,20 +77,27 @@ class Portfolio:
         portfolioAnalysisRequest.text # get in text string format
         portfolioAnalysisRequest.json # get as json object
         self.y = json.loads(portfolioAnalysisRequest.text)
-        #print(json.dumps(self.y, indent=2))
         vy = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['weightedAveragePerformance']
         self.returns = vy['marketReturnM1']
         self.other = vy['marketReturnM2']
+        print(self.returns)
+        print(self.other)
         self.recommend()
         
     def recommend(self):
+        import json, csv
         # if self.other > self.returns:
         #     return(None)
         # else:
-        start = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']#['startDate']
-        print(start)
+        start = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['startDate']
+        with open('vix.csv', mode='r') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            csv_reader = list(csv_reader))
+        start = str(start)[:4] + '-' + str(start)[4:6] + '-' + '01'
+        print(csvreader[start])
+        
 if __name__ == "__main__":
-    port = Portfolio(0,['DSY'])
+    port = Portfolio(2,['AAPL','GOOG'])
     port.get_market_returns()
 
 
