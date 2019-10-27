@@ -91,11 +91,19 @@ def webhook_post():
         print("Split", split)
         companies = convert(split)
         print("Conversion of split", companies)
+
+        #return jsonify({"fulfillmentText" : "high mohan"})
+
         portfolio = Portfolio(risk, companies)
-        ret, delta = portfolio.get_market_returns()
+        ret, delta = portfolio.get_market_returns(phone_number)
         print(f"{ret} : {delta}")
-        d = {"fulfillmentText" : f"Hey, we have added the following: {companies}. Ret: {ret}, Delta: {delta}."}
-        return jsonify(d)
+        months = 5
+        for x in range(months):
+            portfolio.get_market_returns(phone_number)
+        print(f"{months} months later")
+        #d = {"fulfillmentText" : f"Hey, we have added the following: {companies}. Ret: {ret}, Delta: {delta}."}
+        #print(f"d: {d}")
+        #return jsonify(d)
     return {}
 
 # run the app

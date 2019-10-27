@@ -23,10 +23,10 @@ print(company)
 stringdic = {
 'blackrock' : 'BLK',
 'att' : 'T',
-'apple' : 'APPL',
+'apple' : 'AAPL',
 'microsoft' : 'MSFT',
 'google' : 'GOOG',
-'faceboook' : 'FB',
+'facebook' : 'FB',
 'nike' : 'NKE',
 'southwest' : 'LUV'
 }
@@ -38,7 +38,7 @@ def convert(tokenized_string_list):
         if company.lower() in stringdic:
             actual_list.append(stringdic[company.lower()])
     return actual_list
-            
+
 
 
 
