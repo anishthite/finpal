@@ -2,46 +2,88 @@
 from flask import Flask, request, make_response, jsonify
 import sys
 import json
+from portfolio import Portfolio
+from test import convert
+import re
 # initialize the flask app
 app = Flask(__name__)
-
+qlist = []
+raw_companies = None
+risk = None
+portfolio = None
+def reset():
+    global qlist, clist, risk
+    qlist, raw_companies, risk = [], None, None
 # default route
 @app.route('/')
 def index():
     return 'Hello World!'
 
-def f(l):
+def compute_risk(l):
     """
     Args:
         seq[str] : sequence of user response to 13 questions
     Returns:
         str : risky-ness. either: "L", "M", "H"
     """
-    assert(len(l) == 13), f"expecting 13 entries, but actual: {len(l)}"
+    assert(len(l) == 13), ("expected 13 entries but actually %d" % len(l))
     accum = 0
-    one = {"a":4, "b":3, "c":2, "d":1}
-    diff = {"a":1, "b":3, "c":0, "d":0}
-    reg = {"a":1, "b":3, "c":3, "d":4}
+    one = {"A":4, "B":3, "C":2, "D":1}
+    diff = {"A":1, "B":3, "C":0, "D":0}
+    reg = {"A":1, "B":3, "C":3, "D":4}
     for i, val in enumerate(l):
         if i == 0:
-            accum += one[val]
+            accum += one[val.upper()]
         elif i == 8 or i == 9:
-            accum += diff[val]
+            accum += diff[val.upper()]
         else:
-            accum += reg[val]
+            accum += reg[val.upper()]
     if accum < 21:
-        return "L"
+        return 0
     elif 21 <= accum <= 30:
-        return "M"
+        return 1
     else:
-        return "H"
-
+        return 2
+def compute_companies(raw):
+    """TODO: anish put company to ticks mapping here"""
+    return raw
 # create a route for webhook
 @app.route('/webhook', methods=['POST'])
 def webhook_post():
+    global qlist, risk, raw_companies
     data = request.get_json()
-    action = data.get('queryResult')
-    print data
+    q_type = list(data.get('queryResult').get("parameters").keys())[0]
+    response = data.get('queryResult').get('queryText')
+    print("%s : %s" % (q_type, response))
+    if q_type == "Tolerance":
+        risk = response
+    elif q_type == "any":
+        #raw_companies = data.get('queryResult').get("parameters").values()[0]
+        raw_companies = response
+    elif q_type == "Response":
+        qlist.append(response)
+    elif q_type == "Reset":
+        reset()
+    else:
+        pass
+    print(q_type)
+    print(qlist)
+    print(risk)
+    print(raw_companies)
+
+    # check if we can calc risky
+    if (len(qlist) == 13 and risk == None):
+        risk = compute_risk(qlist)
+        d = {"fulfillmentText" : "Hey, you have finished the questionnaire. Here is your risk: %s. Please enter any specific companies you are interested in. or 'None' if there are none." % risk}
+        return jsonify(d)
+    elif (risk is not None and raw_companies is not None):
+        print(raw_companies)
+        split = [s.lower() for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', raw_companies) if len(s) > 0]
+        print(split)
+        companies = convert(split)
+        print(companies)
+        portfolio = Portfolio(risk, companies)
+        print(portfolio.get_market_returns())
     return {}
 
 # run the app

@@ -1,16 +1,17 @@
 
 
 class Portfolio:
-    
+
 
     def __init__(self, risk,initial_companies):
-        
+        print(initial_companies)
+        print(risk)
         self.portfolio = {}
         self.returns = 0
         self.other = 0
         self.count = 0
 
-        if risk == 0:
+        if int(risk) == 1:
             self.portfolio['CASH-USD'] = [.2,'c']
             self.cashprop = .2
             self.bondsprop = .7
@@ -19,8 +20,8 @@ class Portfolio:
             self.allocate_random('stocks', .1, initial_companies, 's')
             self.actual = ''
             self.date = 0
-            
-        if risk == 1:
+
+        if int(risk) == 2:
             self.portfolio['CASH-USD'] = [.1, 'c']
             self.cashprop = .1
             self.bondsprop = .4
@@ -30,7 +31,7 @@ class Portfolio:
             self.allocate_random('stocks', .4, initial_companies, 's')
             self.date = 0
 
-        if risk == 2:        
+        if int(risk) == 3:
             self.cashprop = .0
             self.portfolio['CASH-USD'] = [.0,'c']
             self.bondsprop = .3
@@ -39,9 +40,9 @@ class Portfolio:
             self.allocate_random('bonds', .3, [], 'b')
             self.allocate_random('stocks', .7, initial_companies, 's')
             self.date = 0
-
+        print(self.portfolio)
     def allocate_random(self,type, type_prop, initial_companies, char):
-        
+
         possible_tickers = []
         import csv
         import random
@@ -66,9 +67,9 @@ class Portfolio:
         mydic = {}
         for stock in possible_tickers:
             self.portfolio[stock[0]] = [type_prop * proportion[counter] , char]
-            counter +=1        
+            counter +=1
         print(self.portfolio)
-         
+
     def blackrockify(self):
         mystr=''
         for company in self.portfolio:
@@ -78,15 +79,16 @@ class Portfolio:
 
     def get_market_returns(self):
         import requests, json
-        
+
         mystr = self.blackrockify()
         portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : mystr})
         portfolioAnalysisRequest.text # get in text string format
         portfolioAnalysisRequest.json # get as json object
         self.y = json.loads(portfolioAnalysisRequest.text)
-        #print(self.y)
+        #print(json.dumps(self.y, indent=2))
         vy = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['weightedAveragePerformance']
-        
+
+
         if self.returns == self.other:
             self.returns = vy['marketReturnM2']
             self.other = vy['marketReturnM3']
@@ -114,7 +116,7 @@ class Portfolio:
             else:
                 start = self.date
             #end = start + 100
-            
+
             if str(start)[4:6] == '12':
                 end = start + 10000 - 1100
             else:
@@ -124,8 +126,8 @@ class Portfolio:
                 csv_reader = csv.reader(csv_file)
                 vix_data = {}
                 for date, op, hi, lo, cl, adj, v in csv_reader:
-                    vix_data[date] = float(adj)            
-            
+                    vix_data[date] = float(adj)
+
             start = str(start)[:4] + '-' + str(start)[4:6] + '-' + '01'
             end = str(end)[:4] + '-' + str(end)[4:6] + '-' + '01'
             #if difference is smaller, it means that vol decreased, move to equity
@@ -157,18 +159,10 @@ class Portfolio:
                         self.portfolio[company][0] = new_stock * self.portfolio[company][0] / self.stocksprop
                 self.stocksprop = new_stock
                 self.bondsprop = new_bond
-        return diff    
-        
+        return diff
+
 if __name__ == "__main__":
     port = Portfolio(0,['AAPL'])
     port.get_market_returns()
     for x in range(5):
         port.get_market_returns()
-
-
-
-
-
-
-
-
