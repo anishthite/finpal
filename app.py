@@ -11,6 +11,7 @@ qlist = []
 raw_companies = None
 risk = None
 portfolio = None
+phone_number = None
 def reset():
     global qlist, clist, risk
     qlist, raw_companies, risk = [], None, None
@@ -50,7 +51,7 @@ def compute_companies(raw):
 # create a route for webhook
 @app.route('/webhook', methods=['POST'])
 def webhook_post():
-    global qlist, risk, raw_companies
+    global qlist, risk, raw_companies, phone_number
     data = request.get_json()
     q_type = list(data.get('queryResult').get("parameters").keys())[0]
     response = data.get('queryResult').get('queryText')
@@ -64,6 +65,11 @@ def webhook_post():
         qlist.append(response)
     elif q_type == "Reset":
         reset()
+    elif q_type == "PhoneNumber":
+        print(response)
+        response = response + "\."
+        print(response)
+        phone_number = "".join([s for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', response) if len(s) > 0])
     else:
         pass
     print(q_type)
@@ -74,16 +80,19 @@ def webhook_post():
     # check if we can calc risky
     if (len(qlist) == 13 and risk == None):
         risk = compute_risk(qlist)
-        d = {"fulfillmentText" : "Hey, you have finished the questionnaire. Here is your risk: %s. Please enter any specific companies you are interested in. or 'None' if there are none." % risk}
+        d = {"fulfillmentText" : "Hey, you have finished the questionnaire. Here is your risk: %s. Sending monthly updates to you. What's your phone number?" % risk}
         return jsonify(d)
-    elif (risk is not None and raw_companies is not None):
+    elif (risk is not None and phone_number is not None and raw_companies is not None):
         print(raw_companies)
-        split = [s.lower() for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', raw_companies) if len(s) > 0]
+        split = [s.lower() for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', raw_companies + "\.") if len(s) > 0]
         print(split)
         companies = convert(split)
         print(companies)
         portfolio = Portfolio(risk, companies)
-        print(portfolio.get_market_returns())
+        ret, delta = portfolio.get_market_returns()
+        print(f"{ret} : {delta}")
+        d = {"fulfillmentText" : f"Hey, we have added the following: {companies}. Ret: {ret}, Delta: {delta}."}
+        return jsonify(d)
     return {}
 
 # run the app
