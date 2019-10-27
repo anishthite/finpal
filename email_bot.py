@@ -36,7 +36,7 @@ class Email():
             server.ehlo()
             server.starttls()
             server.ehlo()
-            server.login(self.sender,'Smith1234') #put your email in first quote and password inside other
+            server.login(self.sender,'yeeterson') #put your email in first quote and password inside other
             server.send_message(self.msg)
             print("send " + str(x))
         server.close()
@@ -46,5 +46,5 @@ class Email():
 #
 #3392358085
 #9786895689@vtext.com
-email = Email( "gpbudyeeterson@gmail.com", "2039099118@txt.att.net", "Your portfolio data", "Yeet the feet", "", 1)
-email.send()
+# email = Email( "finpal321@gmail.com", "6107418265@txt.att.net", "Your portfolio data", "Yeet the feet", "", 200)
+# email.send()

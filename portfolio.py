@@ -1,4 +1,4 @@
-
+from email_bot import Email
 
 class Portfolio:
 
@@ -40,7 +40,7 @@ class Portfolio:
             self.allocate_random('bonds', .3, [], 'b')
             self.allocate_random('stocks', .7, initial_companies, 's')
             self.date = 0
-        print(self.portfolio)
+        print(self.pretty_print())
     def allocate_random(self,type, type_prop, initial_companies, char):
 
         possible_tickers = []
@@ -68,7 +68,7 @@ class Portfolio:
         for stock in possible_tickers:
             self.portfolio[stock[0]] = [type_prop * proportion[counter] , char]
             counter +=1
-        print(self.portfolio)
+        
 
     def blackrockify(self):
         mystr=''
@@ -77,7 +77,7 @@ class Portfolio:
             mystr = ''.join([mystr,compstr,'|'])
         return mystr
 
-    def get_market_returns(self):
+    def get_market_returns(self, number):
         import requests, json
 
         mystr = self.blackrockify()
@@ -99,10 +99,11 @@ class Portfolio:
             self.count +=1
         print(self.returns)
         print(self.other)
+        old = self.returns
         change = self.recommend()
         print(self.portfolio)
-        answertup = (self.returns, change)
-        print(answertup)
+        answertup = (old, change)
+        self.emailz(number,answertup)
         return answertup
     def recommend(self):
         diff = 0
@@ -161,8 +162,36 @@ class Portfolio:
                 self.bondsprop = new_bond
         return diff
 
+    def pretty_print(self):
+        my_str = ''.join([" ", str(self.bondsprop) , ' proportion of your money in bonds and ' , str(self.stocksprop) , ' of your money in stocks. ' , str(self.cashprop),' of your money is held in cash.']) 
+        for company in self.portfolio.keys():
+            my_str += ''.join([company, ' allocations: ', '%.2f' % self.portfolio[company][0] , "."])
+        return my_str
+            
+    def print_return(self,mytup):
+        if mytup[1] < 0:
+            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 10000),' dollars. We moved ' , str(mytup[1]) , " of your portfolio from bonds to equities, as we think the market will do well."])
+        elif mytup[1]  > 0:
+            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 10000),' dollars. We moved ' , str(mytup[1]) , " of your portfolio from equities to bonds since we think the market will do poorly."])
+        else:
+            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 10000),' dollars. We did not feel the need to change your portfolio.'])
+
+
+    def emailz(self, number, mytup):
+
+        mystr = self.print_return(mytup) + self.pretty_print()
+        email = Email( "finpal321@gmail.com", number + "@txt.att.net", "Your portfolio data!", mystr, "", 1)
+        email.send()
+        email = Email( "finpal321@gmail.com", number + "@tmomail.net", "Your portfolio data!", mystr, "", 1)
+        email.send()
+        email = Email( "finpal321@gmail.com", number + "@vtext.com", "Your portfolio data!", mystr, "", 1)
+        email.send()
+        email = Email( "finpal321@gmail.com", number + "@messaging.sprintpcs.com", "Your portfolio data!", mystr, "", 1)
+        email.send()
+
 if __name__ == "__main__":
-    port = Portfolio(0,['AAPL'])
-    port.get_market_returns()
+    port = Portfolio(2,['AAPL'])
+    print(port.pretty_print())
+    port.get_market_returns('2039099118')
     for x in range(5):
-        port.get_market_returns()
+        port.get_market_returns('2039099118')
