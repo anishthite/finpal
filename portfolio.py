@@ -8,7 +8,7 @@ class Portfolio:
         self.portfolio = {}
         self.returns = 0
         self.other = 0
-
+        self.count = 0
 
         if risk == 0:
             self.portfolio['CASH-USD'] = [.2,'c']
@@ -84,14 +84,17 @@ class Portfolio:
         portfolioAnalysisRequest.text # get in text string format
         portfolioAnalysisRequest.json # get as json object
         self.y = json.loads(portfolioAnalysisRequest.text)
+        #print(self.y)
         vy = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['weightedAveragePerformance']
         
         if self.returns == self.other:
             self.returns = vy['marketReturnM2']
             self.other = vy['marketReturnM3']
+            self.count +=1
         else:
             self.returns = vy['marketReturnM1']
             self.other = vy['marketReturnM2']
+            self.count +=1
         print(self.returns)
         print(self.other)
         change = self.recommend()
@@ -102,7 +105,7 @@ class Portfolio:
     def recommend(self):
         diff = 0
         import json, csv
-        if self.other > self.returns:
+        if self.other > self.returns and self.count <= 2:
             self.returns = self.other
             return(0)
         else:
@@ -157,7 +160,7 @@ class Portfolio:
         return diff    
         
 if __name__ == "__main__":
-    port = Portfolio(2,['AAPL'])
+    port = Portfolio(0,['AAPL'])
     port.get_market_returns()
     for x in range(5):
         port.get_market_returns()
