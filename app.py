@@ -9,19 +9,16 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return 'Hello World!'
-def webhook():
-    print("webhook");sys.stdout.flush()
-    print(request.json)
+
 
 # create a route for webhook
-@app.route('/webhook', methods=['GET', 'POST'])
-def webhook():
-    print('hi')
-    # text = req.get('queryResult')
-    #action = req.get('queryAction').get('action')
-
-    return 'yes'
+@app.route('/webhook', methods=['POST'])
+def webhook_post():
+    data = request.get_json()
+    action = data.get('queryResult')
+    print data
+    return {}
 
 # run the app
 if __name__ == '__main__':
-   app.run()
+   app.run(debug=True)
