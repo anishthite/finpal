@@ -9,6 +9,7 @@ class Portfolio:
         self.returns = 0
         self.other = 0
 
+
         if risk == 0:
             self.portfolio['CASH-USD'] = [.2,'c']
             self.cashprop = .2
@@ -77,6 +78,7 @@ class Portfolio:
 
     def get_market_returns(self):
         import requests, json
+        
         mystr = self.blackrockify()
         portfolioAnalysisRequest = requests.get("https://www.blackrock.com/tools/hackathon/portfolio-analysis", params={'positions' : mystr})
         portfolioAnalysisRequest.text # get in text string format
@@ -92,13 +94,17 @@ class Portfolio:
             self.other = vy['marketReturnM2']
         print(self.returns)
         print(self.other)
-        self.recommend()
+        change = self.recommend()
         print(self.portfolio)
+        answertup = (self.returns, change)
+        print(answertup)
+        return answertup
     def recommend(self):
+        diff = 0
         import json, csv
         if self.other > self.returns:
             self.returns = self.other
-            return(None)
+            return(0)
         else:
             if self.date == 0:
                 start = self.y['resultMap']['PORTFOLIOS'][0]['portfolios'][0]['returns']['startDate']
@@ -148,6 +154,7 @@ class Portfolio:
                         self.portfolio[company][0] = new_stock * self.portfolio[company][0] / self.stocksprop
                 self.stocksprop = new_stock
                 self.bondsprop = new_bond
+        return diff    
         
 if __name__ == "__main__":
     port = Portfolio(2,['AAPL'])
