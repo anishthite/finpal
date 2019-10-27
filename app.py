@@ -13,8 +13,9 @@ risk = None
 portfolio = None
 phone_number = None
 def reset():
-    global qlist, clist, risk
+    global qlist, clist, risk, phone_number, portfolio
     qlist, raw_companies, risk = [], None, None
+    phone_number, portfolio = None, None
 # default route
 @app.route('/')
 def index():
@@ -55,27 +56,29 @@ def webhook_post():
     data = request.get_json()
     q_type = list(data.get('queryResult').get("parameters").keys())[0]
     response = data.get('queryResult').get('queryText')
-    print("%s : %s" % (q_type, response))
+    print("Question types %s : %s" % (q_type, response))
     if q_type == "Tolerance":
         risk = response
     elif q_type == "any":
         #raw_companies = data.get('queryResult').get("parameters").values()[0]
         raw_companies = response
     elif q_type == "Response":
+        response = data.get('queryResult').get("parameters").get("Response")[0]
         qlist.append(response)
     elif q_type == "Reset":
         reset()
     elif q_type == "PhoneNumber":
-        print(response)
-        response = response + "\."
-        print(response)
+        print("pre append", response)
+        response = response + ","
+        print("post append", response)
         phone_number = "".join([s for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', response) if len(s) > 0])
     else:
         pass
-    print(q_type)
-    print(qlist)
-    print(risk)
-    print(raw_companies)
+    print("Q type", q_type)
+    print("Q list", qlist)
+    print("Risk factor", risk)
+    print("Phone number", phone_number)
+    print("Raw Companies", raw_companies)
 
     # check if we can calc risky
     if (len(qlist) == 13 and risk == None):
@@ -83,11 +86,11 @@ def webhook_post():
         d = {"fulfillmentText" : "Hey, you have finished the questionnaire. Here is your risk: %s. Sending monthly updates to you. What's your phone number?" % risk}
         return jsonify(d)
     elif (risk is not None and phone_number is not None and raw_companies is not None):
-        print(raw_companies)
-        split = [s.lower() for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', raw_companies + "\.") if len(s) > 0]
-        print(split)
+        print("Raw Companies, if statemetn", raw_companies)
+        split = [s.lower() for s in re.split(';|,|\*|\n|\.|,|!|@|#|$|%|\^|&|\(|\)|-|_| ', raw_companies + ",") if len(s) > 0]
+        print("Split", split)
         companies = convert(split)
-        print(companies)
+        print("Conversion of split", companies)
         portfolio = Portfolio(risk, companies)
         ret, delta = portfolio.get_market_returns()
         print(f"{ret} : {delta}")
