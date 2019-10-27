@@ -10,6 +10,7 @@ class Portfolio:
         self.returns = 0
         self.other = 0
         self.count = 0
+        self.month = 1
 
         if int(risk) == 1:
             self.portfolio['CASH-USD'] = [.2,'c']
@@ -103,7 +104,9 @@ class Portfolio:
         change = self.recommend()
         print(self.portfolio)
         answertup = (old, change)
-        self.emailz(number,answertup)
+        self.email2(number,answertup, self.month)
+        self.email1(number, self.month)
+        self.month +=1
         return answertup
     def recommend(self):
         diff = 0
@@ -163,32 +166,42 @@ class Portfolio:
         return diff
 
     def pretty_print(self):
-        my_str = ''.join([" ", str(self.bondsprop) , ' proportion of your money in bonds and ' , str(self.stocksprop) , ' of your money in stocks. ' , str(self.cashprop),' of your money is held in cash.']) 
+        my_str = ''.join([" ", str(self.bondsprop) , ' proportion of your money in bonds and ' , str(self.stocksprop) , ' of your money in stocks. ' , str(self.cashprop),' of your money is held in cash. ']) 
         for company in self.portfolio.keys():
             my_str += ''.join([company, ' allocations: ', '%.2f' % self.portfolio[company][0] , "."])
         return my_str
             
     def print_return(self,mytup):
         if mytup[1] < 0:
-            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 10000),' dollars. We moved ' , str(mytup[1]) , " of your portfolio from bonds to equities, as we think the market will do well."])
+            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 100),' dollars. We moved ' , str(mytup[1]) , " of your portfolio from bonds to equities, as we think the market will do well. "])
         elif mytup[1]  > 0:
-            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 10000),' dollars. We moved ' , str(mytup[1]) , " of your portfolio from equities to bonds since we think the market will do poorly."])
+            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 100),' dollars. We moved ' , str(mytup[1]) , " of your portfolio from equities to bonds since we think the market will do poorly. "])
         else:
-            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 10000),' dollars. We did not feel the need to change your portfolio.'])
+            return ''.join(['Your portfolio value increased by ',str(mytup[0] * 100),' dollars. We did not feel the need to change your portfolio. '])
 
 
-    def emailz(self, number, mytup):
+    def email1(self, number):
 
-        mystr = self.print_return(mytup) + self.pretty_print()
-        email = Email( "finpal321@gmail.com", number + "@txt.att.net", "Your portfolio data!", mystr, "", 1)
+        mystr = self.pretty_print()
+        email = Email( "finpal321@gmail.com", number + "@txt.att.net", "Your portfolio data for Month ", self.month , "!", mystr, "", 1)
         email.send()
-        email = Email( "finpal321@gmail.com", number + "@tmomail.net", "Your portfolio data!", mystr, "", 1)
+        email = Email( "finpal321@gmail.com", number + "@tmomail.net", "Your portfolio data for Month ", self.month , "!", mystr, "", 1)
         email.send()
-        email = Email( "finpal321@gmail.com", number + "@vtext.com", "Your portfolio data!", mystr, "", 1)
+        email = Email( "finpal321@gmail.com", number + "@vtext.com", "Your portfolio data for Month ", self.month , "!", mystr, "", 1)
         email.send()
-        email = Email( "finpal321@gmail.com", number + "@messaging.sprintpcs.com", "Your portfolio data!", mystr, "", 1)
+        email = Email( "finpal321@gmail.com", number + "@messaging.sprintpcs.com", "Your portfolio data for Month ", self.month , "!", mystr, "", 1)
         email.send()
 
+    def email2(self, number, mytup):
+        mystr = self.print_return(mytup)
+        email = Email( "finpal321@gmail.com", number + "@txt.att.net", "Your return data for Month ", self.month , "!", mystr, "", 1)
+        email.send()
+        email = Email( "finpal321@gmail.com", number + "@tmomail.net", "Your return data for Month ", self.month , "!", mystr, "", 1)
+        email.send()
+        email = Email( "finpal321@gmail.com", number + "@vtext.com", "Your return data for Month ", self.month , "!", mystr, "", 1)
+        email.send()
+        email = Email( "finpal321@gmail.com", number + "@messaging.sprintpcs.com", "Your return data for Month ", self.month , "!", mystr, "", 1)
+        email.send()
 if __name__ == "__main__":
     port = Portfolio(2,['AAPL'])
     print(port.pretty_print())
