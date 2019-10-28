@@ -41,10 +41,3 @@ class Email():
             print("send " + str(x))
         server.close()
         return "Email sent " + str(self.iterations)
-#ankleman1999@gmail.com
-#Mo123286
-#
-#3392358085
-#9786895689@vtext.com
-# email = Email( "finpal321@gmail.com", "6107418265@txt.att.net", "Your portfolio data", "Yeet the feet", "", 200)
-# email.send()
