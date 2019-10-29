@@ -1,6 +1,6 @@
 # FinPal
 
-## A Hackathon project made in @HackGT 6 
+## A Hackathon project made in HackGT 6 
 
 ##### _The goal_
 Finpal is a chatbot which aims to help people who are new to investing jump right in.  New investors will liekly not know how to allocate certain stocks, which stocks are safe, and what bonds and other securities are, so we wanted to make a tool which could make them a starter portfolio.  
